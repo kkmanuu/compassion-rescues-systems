@@ -1,6 +1,6 @@
 const pool = require('../config/db');
 
-exports.submitFeedback = async (req, res) => {
+const submitFeedback = async (req, res) => {
   try {
     const { userId, feedback } = req.body;
 
@@ -17,7 +17,7 @@ exports.submitFeedback = async (req, res) => {
   }
 };
 
-exports.getAllFeedback = async (req, res) => {
+const getAllFeedback = async (req, res) => {
   try {
     const { role } = req.user;
 
@@ -33,7 +33,7 @@ exports.getAllFeedback = async (req, res) => {
   }
 };
 
-exports.updateFeedbackStatus = async (req, res) => {
+const updateFeedbackStatus = async (req, res) => {
   try {
     const { role } = req.user;
 
@@ -54,4 +54,36 @@ exports.updateFeedbackStatus = async (req, res) => {
     console.error('Update Feedback Error:', error);
     res.status(500).json({ message: 'Server error' });
   }
+};
+
+const submitAdminFeedback = async (req, res) => {
+  try {
+    const { role } = req.user;
+    const { feedbackId, response } = req.body;
+
+    if (role !== 'admin') {
+      return res.status(403).json({ message: 'Only admins can submit feedback responses' });
+    }
+
+    if (!feedbackId || !response) {
+      return res.status(400).json({ message: 'Feedback ID and response are required' });
+    }
+
+    await pool.query(
+      'UPDATE feedback SET admin_response = ?, status = "responded" WHERE id = ?',
+      [response, feedbackId]
+    );
+
+    res.json({ message: 'Feedback response submitted successfully' });
+  } catch (error) {
+    console.error('Admin Feedback Submission Error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+module.exports = {
+  submitFeedback,
+  getAllFeedback,
+  updateFeedbackStatus,
+  submitAdminFeedback
 };
