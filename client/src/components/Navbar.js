@@ -27,6 +27,12 @@ const Navbar = () => {
             <Button color="inherit" component={Link} to="/">Home</Button>
             <Button color="inherit" component={Link} to="/dashboard">Dashboard</Button>
             <Button color="inherit" component={Link} to="/emergency">Emergency</Button>
+            <Button color="inherit" component={Link} to="/admin/feedback">Admin Feedback</Button>
+            {/* Only show Reports button if user is admin */}
+            {localStorage.getItem('role') === 'admin' && (
+              <Button color="inherit" component={Link} to="/admin/feedback">Admin Feedback</Button>
+            )}
+            {/* Only show Reports button if user is admin */}
             <Button color="inherit" component={Link} to="/report">Reports</Button>
             <Button color="inherit" onClick={handleLogout}>Logout</Button>
           </Box>
