@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { TextField, Button, Container, Typography, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { register } from '../services/api'; // API call
+import axios from 'axios'; // Direct axios call since api.js may not have both endpoints
 
 const Register = () => {
   const [credentials, setCredentials] = useState({
     username: '',
     email: '',
     password: '',
-    role: 'user' // Default role is 'user'
+    role: 'user'
   });
 
   const [error, setError] = useState(null);
@@ -17,14 +17,14 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate required fields based on role
     if (!credentials.username || !credentials.password || (credentials.role === 'admin' && !credentials.email)) {
-      setError("All required fields must be filled.");
+      setError('All required fields must be filled.');
       return;
     }
 
     try {
-      const response = await register(credentials);
+      const endpoint = credentials.role === 'admin' ? '/auth/register-admin' : '/auth/register';
+      const response = await axios.post(`http://localhost:5000/api${endpoint}`, credentials);
       alert(response.data.message);
       navigate('/login');
     } catch (error) {
@@ -38,7 +38,6 @@ const Register = () => {
       <Typography variant="h4" gutterBottom>Register</Typography>
       {error && <Typography color="error" sx={{ mb: 2 }}>{error}</Typography>}
       <form onSubmit={handleSubmit}>
-        {/* Username Field */}
         <TextField
           label="Username"
           fullWidth
@@ -46,8 +45,6 @@ const Register = () => {
           value={credentials.username}
           onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
         />
-
-        {/* Email Field (Only for Admins) */}
         {credentials.role === 'admin' && (
           <TextField
             label="Email"
@@ -58,8 +55,6 @@ const Register = () => {
             onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
           />
         )}
-
-        {/* Password Field */}
         <TextField
           label="Password"
           type="password"
@@ -68,8 +63,6 @@ const Register = () => {
           value={credentials.password}
           onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
         />
-
-        {/* Role Selection */}
         <FormControl fullWidth margin="normal">
           <InputLabel>Role</InputLabel>
           <Select
@@ -80,7 +73,6 @@ const Register = () => {
             <MenuItem value="admin">Admin</MenuItem>
           </Select>
         </FormControl>
-
         <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
           Register
         </Button>
