@@ -37,6 +37,15 @@ export const createCase = (caseData) => api.post('/cases', caseData);
 export const getCases = () => api.get('/cases');
 export const getCaseDetails = (caseId) => api.get(`/cases/${caseId}`);
 export const updateCaseStatus = (caseId, status) => api.put(`/cases/${caseId}/status`, { status });
+// src/services/api.js
+export const approveCase = async (caseId, data) => {
+  const token = localStorage.getItem('token');
+  console.log("Authorization Token:", token);
+  return api.put(`/cases/${caseId}/approve`, data);
+};
+
+
+export const deleteCase = (caseId) => api.delete(`/cases/${caseId}`);
 
 // Messages API
 export const getMessages = (caseId) => api.get(`/messages/case/${caseId}`);
@@ -45,9 +54,8 @@ export const sendMessage = (messageData) => api.post('/messages', messageData);
 // Reports API
 export const getReport = () => api.get('/reports/cases');
 
-export const deleteCase = async (caseId) => {
-  return await axios.delete(`/api/cases/${caseId}`);
-};
+// Feedback API
+export const getAllFeedback = () => api.get('/feedback'); // Added this line
+export const submitAdminFeedback = (feedbackId, response) => api.post('/feedback/admin-response', { feedbackId, response });
 
-// Default export for Axios instance
 export default api;
