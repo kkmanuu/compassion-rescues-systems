@@ -1,16 +1,16 @@
 const express = require('express');
-const { createCase, getAllCases, getCaseDetails, updateCaseStatus } = require('../controllers/caseController');
-const authMiddleware = require('../middleware/auth'); // Ensure correct path
-
 const router = express.Router();
+const { createCase, getAllCases, getCaseDetails, updateCaseStatus, deleteCase, approveCase } = require('../controllers/caseController');
+const authMiddleware = require('../middleware/auth');
 
-// Public routes (accessible by everyone)
+router.use(authMiddleware.protect);
+
+router.post('/', createCase);
 router.get('/', getAllCases);
 router.get('/:caseId', getCaseDetails);
+router.delete('/:caseId', authMiddleware.restrictTo('admin'), deleteCase);
+router.put('/:caseId/status', authMiddleware.restrictTo('admin'), updateCaseStatus);
+router.put('/:id/approve', authMiddleware.protect, authMiddleware.restrictTo('admin'), approveCase);
 
-
-// Admin-restricted routes
-router.post('/', authMiddleware.protect, createCase);
-router.put('/:caseId/status', authMiddleware.protect, updateCaseStatus);
 
 module.exports = router;
