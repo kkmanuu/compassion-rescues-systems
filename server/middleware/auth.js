@@ -7,6 +7,7 @@ exports.protect = async (req, res, next) => {
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
       token = req.headers.authorization.split(' ')[1];
     }
+
     if (!token) {
       return res.status(401).json({ message: 'Not authorized, no token' });
     }
@@ -18,7 +19,8 @@ exports.protect = async (req, res, next) => {
       return res.status(401).json({ message: 'User not found' });
     }
 
-    req.user = users[0]; // ✅ Store user details in `req.user`
+    req.user = users[0]; // ✅ Ensure req.user contains role
+    console.log("Authenticated User:", req.user); // ✅ Debugging log
     next();
   } catch (err) {
     console.error(err);
@@ -26,11 +28,11 @@ exports.protect = async (req, res, next) => {
   }
 };
 
-// ✅ Restrict access based on user role
+
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
-    if (!req.user || !roles.includes(req.user.role)) {
-      return res.status(403).json({ message: 'You do not have permission to perform this action' });
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ message: "You do not have permission to perform this action" });
     }
     next();
   };
