@@ -2,41 +2,61 @@ import React from 'react';
 import { Container, Typography, Button, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
+// Import the video file from the src directory
+import backgroundVideo from '../pages/5266045-uhd_3840_2160_30fps.mp4';
+
 const Home = () => {
   const navigate = useNavigate();
   const isAuthenticated = !!localStorage.getItem('token');
-
-  // Background image URL (replace with your own image URL)
-  const backgroundImageUrl = 'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?auto=format&fit=crop&w=1350&q=80';
 
   return (
     <Box
       sx={{
         width: '100vw', // Full screen width
         height: '100vh', // Full screen height
-        backgroundImage: `url(${backgroundImageUrl})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
+        position: 'relative',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
         color: '#fff',
         textAlign: 'center',
-        position: 'relative',
-        '&::before': {
-          content: '""',
+        overflow: 'hidden', // Prevent video overflow
+      }}
+    >
+      {/* Background Video */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        style={{
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover', // Ensures video covers the container
+          top: 0,
+          left: 0,
+          zIndex: 0,
+        }}
+      >
+        <source src={backgroundVideo} type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+
+      {/* Overlay for better text visibility */}
+      <Box
+        sx={{
           position: 'absolute',
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dark overlay for better text visibility
+          backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dark overlay
           zIndex: 1,
-        },
-      }}
-    >
+        }}
+      />
+
       {/* Content wrapper */}
       <Box sx={{ position: 'relative', zIndex: 2, maxWidth: '800px' }}>
         <Typography
@@ -62,7 +82,6 @@ const Home = () => {
                 gutterBottom
                 sx={{ fontWeight: 'medium', textShadow: '1px 1px 3px rgba(0, 0, 0, 0.5)' }}
               >
-               
               </Typography>
               <Button
                 variant="contained"
