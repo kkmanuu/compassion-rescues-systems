@@ -1,4 +1,4 @@
-const pool = require('../config/db');
+const pool = require("../config/db");
 
 exports.generateCaseReport = async (req, res) => {
   try {
@@ -43,11 +43,19 @@ exports.generateCaseReport = async (req, res) => {
     `);
 
     res.status(200).json({
-      status: 'success',
-      data: { caseTypes, caseStatuses, caseLocations, monthlyTrends, generatedAt: new Date().toISOString() }
+      status: "success",
+      data: {
+        caseTypes,
+        caseStatuses,
+        caseLocations,
+        monthlyTrends,
+        generatedAt: new Date().toISOString(),
+      },
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ status: 'error', message: 'Failed to generate report' });
+    res
+      .status(500)
+      .json({ status: "error", message: "Failed to generate report" });
   }
 };
