@@ -1,4 +1,4 @@
-const pool = require('../config/db');
+const pool = require("../config/db");
 
 exports.generateCaseReport = async (req, res) => {
   try {
@@ -49,25 +49,33 @@ exports.generateCaseReport = async (req, res) => {
       caseStatuses,
       caseLocations,
       monthlyTrends,
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
     };
 
     // Save the report to the database
     const [reportResult] = await pool.query(
       `INSERT INTO reports (title, description, data, created_at) VALUES (?, ?, ?, NOW())`,
-      ["Case Report", "Automated case report generated", JSON.stringify(reportData)]
+      [
+        "Case Report",
+        "Automated case report generated",
+        JSON.stringify(reportData),
+      ]
     );
 
     // Fetch the newly saved report
-    const [savedReport] = await pool.query(`SELECT * FROM reports WHERE id = ?`, [reportResult.insertId]);
+    const [savedReport] = await pool.query(
+      `SELECT * FROM reports WHERE id = ?`,
+      [reportResult.insertId]
+    );
 
     res.status(201).json({
-      status: 'success',
-      data: savedReport[0]
+      status: "success",
+      data: savedReport[0],
     });
-
   } catch (err) {
-    console.error('Database error:', err);
-    res.status(500).json({ status: 'error', message: 'Failed to generate report' });
+    console.error("Database error:", err);
+    res
+      .status(500)
+      .json({ status: "error", message: "Failed to generate report" });
   }
 };
