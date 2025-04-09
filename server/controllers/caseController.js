@@ -1,30 +1,48 @@
 // controllers/caseController.js
-const pool = require('../config/db');
+const pool = require("../config/db");
 
 exports.createCase = async (req, res) => {
   try {
-    const { name, phone, email, age, gender, location, case_type, description, severity } = req.body;
+    const {
+      name,
+      phone,
+      email,
+      age,
+      gender,
+      location,
+      case_type,
+      description,
+      severity,
+    } = req.body;
     const userId = req.user.id;
 
     const [victimResult] = await pool.query(
-      'INSERT INTO victims (name, phone, email, age, gender, location, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      "INSERT INTO victims (name, phone, email, age, gender, location, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
       [name, phone, email, age, gender, location, userId]
     );
-    
+
     const [caseResult] = await pool.query(
-      'INSERT INTO cases (victim_id, case_type, description, severity, location, status, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())',
-      [victimResult.insertId, case_type, description, severity, location, 'pending']
-    );
-    
-    const [newCase] = await pool.query(
-      'SELECT * FROM cases WHERE id = ?',
-      [caseResult.insertId]
+      "INSERT INTO cases (victim_id, case_type, description, severity, location, status, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())",
+      [
+        victimResult.insertId,
+        case_type,
+        description,
+        severity,
+        location,
+        "pending",
+      ]
     );
 
-    res.status(201).json({ caseId: caseResult.insertId, created_at: newCase[0].created_at });
+    const [newCase] = await pool.query("SELECT * FROM cases WHERE id = ?", [
+      caseResult.insertId,
+    ]);
+
+    res
+      .status(201)
+      .json({ caseId: caseResult.insertId, created_at: newCase[0].created_at });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -36,7 +54,7 @@ exports.getAllCases = async (req, res) => {
     let query;
     let params;
 
-    if (userRole === 'admin') {
+    if (userRole === "admin") {
       query = `
         SELECT c.*, 
                v.name as victim_name, v.phone, v.email, v.age, v.gender, v.location
@@ -61,7 +79,7 @@ exports.getAllCases = async (req, res) => {
     res.json(cases);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -84,8 +102,8 @@ exports.getCaseDetails = async (req, res) => {
 
     res.json(cases[0]);
   } catch (err) {
-    console.error('Database error:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Database error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -95,38 +113,45 @@ exports.approveCase = async (req, res) => {
     const caseId = req.params.id;
 
     // Validation
-    if (typeof approved !== 'boolean') {
-      return res.status(400).json({ message: 'Approval status is required' });
+    if (typeof approved !== "boolean") {
+      return res.status(400).json({ message: "Approval status is required" });
     }
 
     // Update database
     const [result] = await pool.query(
-      'UPDATE cases SET status = ?, admin_feedback = ?, approved_at = ? WHERE id = ?',
-      [approved ? 'approved' : 'rejected', feedback || null, approved ? new Date() : null, caseId]
+      "UPDATE cases SET status = ?, admin_feedback = ?, approved_at = ? WHERE id = ?",
+      [
+        approved ? "approved" : "rejected",
+        feedback || null,
+        approved ? new Date() : null,
+        caseId,
+      ]
     );
 
     // Check if update was successful
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: 'Case not found' });
+      return res.status(404).json({ message: "Case not found" });
     }
 
-    res.json({ message: `Case ${approved ? 'approved' : 'rejected'} successfully` });
+    res.json({
+      message: `Case ${approved ? "approved" : "rejected"} successfully`,
+    });
   } catch (error) {
-    console.error('Approve Case Error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Approve Case Error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 exports.deleteCase = async (req, res) => {
   try {
     const { caseId } = req.params;
-    
-    await pool.query('DELETE FROM messages WHERE case_id = ?', [caseId]);
-    await pool.query('DELETE FROM cases WHERE id = ?', [caseId]);
 
-    res.json({ message: 'Case deleted successfully' });
+    await pool.query("DELETE FROM messages WHERE case_id = ?", [caseId]);
+    await pool.query("DELETE FROM cases WHERE id = ?", [caseId]);
+
+    res.json({ message: "Case deleted successfully" });
   } catch (err) {
-    console.error('Delete Case Error:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Delete Case Error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -134,13 +159,16 @@ exports.updateCaseStatus = async (req, res) => {
   try {
     const { caseId } = req.params;
     const { status } = req.body;
-    
-    await pool.query(
-      'UPDATE cases SET status = ? WHERE id = ?',
-      [status, caseId]
-    );
 
-    const [caseData] = await pool.query('SELECT victim_id FROM cases WHERE id = ?', [caseId]);
+    await pool.query("UPDATE cases SET status = ? WHERE id = ?", [
+      status,
+      caseId,
+    ]);
+
+    const [caseData] = await pool.query(
+      "SELECT victim_id FROM cases WHERE id = ?",
+      [caseId]
+    );
     const victimId = caseData[0].victim_id;
 
     await pool.query(
@@ -148,10 +176,10 @@ exports.updateCaseStatus = async (req, res) => {
       [caseId, victimId, `Your case has been ${status.toLowerCase()}.`]
     );
 
-    res.json({ message: 'Status updated and user notified' });
+    res.json({ message: "Status updated and user notified" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
