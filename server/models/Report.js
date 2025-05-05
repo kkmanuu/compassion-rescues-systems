@@ -16,6 +16,7 @@ class Report {
     return rows;
   }
 
+  
   static async findById(id) {
     const [rows] = await pool.query("SELECT * FROM reports WHERE id = ?", [id]);
     return rows[0];
