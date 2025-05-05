@@ -8,6 +8,7 @@ class Admin {
     return rows[0];
   }
 
+  
   static async create(username, password, role = "staff") {
     const [result] = await pool.query(
       "INSERT INTO users (username, password, role, ) VALUES (?, ?, ?)",
