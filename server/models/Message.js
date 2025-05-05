@@ -16,6 +16,7 @@ class Message {
     );
     return rows;
   }
+  
 }
 
 module.exports = Message;
