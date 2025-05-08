@@ -5,3 +5,4 @@ const reportController = require("../controllers/reportController");
 router.get("/cases", reportController.generateCaseReport);
 
 module.exports = router;
+
