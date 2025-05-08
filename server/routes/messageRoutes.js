@@ -13,3 +13,4 @@ router.get("/case/:caseId", messageController.getCaseMessages);
 router.post("/", messageController.sendMessage);
 
 module.exports = router;
+
