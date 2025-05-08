@@ -59,3 +59,4 @@ exports.generateCaseReport = async (req, res) => {
       .json({ status: "error", message: "Failed to generate report" });
   }
 };
+
