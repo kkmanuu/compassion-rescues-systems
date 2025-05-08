@@ -17,4 +17,3 @@ router.patch("/cases/:caseId/reject", protect, adminOnly, rejectCase);
 router.post("/messages/admin", protect, adminOnly, sendAdminMessage);
 
 module.exports = router;
-
