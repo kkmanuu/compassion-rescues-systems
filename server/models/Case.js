@@ -9,7 +9,6 @@ class Case {
     return result.insertId;
   }
 
-  
   static async findAll() {
     const [rows] = await pool.query(`
       SELECT c.*, v.name as victim_name, v.phone, v.email, v.age, v.gender 
