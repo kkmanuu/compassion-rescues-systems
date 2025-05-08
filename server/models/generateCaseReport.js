@@ -13,7 +13,6 @@ exports.generateCaseReport = async (req, res) => {
       ORDER BY count DESC
     `);
 
-    
     const [caseStatuses] = await pool.query(`
       SELECT 
         status, 
