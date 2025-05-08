@@ -51,3 +51,4 @@ exports.sendMessage = async (req, res) => {
       .json({ status: "error", message: "Failed to send message" });
   }
 };
+
